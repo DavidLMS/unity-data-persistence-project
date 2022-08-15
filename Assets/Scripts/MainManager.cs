@@ -7,8 +7,6 @@ using System.IO;
 
 public class MainManager : MonoBehaviour
 {
-    public static MainManager Instance;
-    public string BestScore;
 
     public Brick BrickPrefab;
     public int LineCount = 6;
@@ -19,28 +17,17 @@ public class MainManager : MonoBehaviour
     public GameObject GameOverText;
     
     private bool m_Started = false;
-    private int m_Points;
+    public static int m_Points;
     
     private bool m_GameOver = false;
 
+
     
-    private void Awake()
-    {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        
-    }
 
     private void Start()
     {
-        BestScoreText.text = "Best Score: " + MenuUIHandler.playerName + " - " + BestScore;
+        SceneController.Instance.LoadScore();
+        BestScoreText.text = "Best Score: " + SceneController.BestPlayer + " - " + SceneController.BestScore;
 
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
@@ -91,34 +78,11 @@ public class MainManager : MonoBehaviour
     public void GameOver()
     {
         m_GameOver = true;
+        SceneController.Instance.SaveScore();
+        SceneController.Instance.LoadScore();
+        BestScoreText.text = "Best Score: " + SceneController.BestPlayer + " - " + SceneController.BestScore;
         GameOverText.SetActive(true);
     }
 
-    [System.Serializable]
-    class SaveData
-    {
-        public string BestScore;
-    }
-
-    public void SaveScore()
-    {
-        SaveData data = new SaveData();
-        data.BestScore = BestScore;
-
-        string json = JsonUtility.ToJson(data);
-
-        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
-    }
-
-    public void LoadScore()
-    {
-        string path = Application.persistentDataPath + "/savefile.json";
-        if (File.Exists(path))
-        {
-            string json = File.ReadAllText(path);
-            SaveData data = JsonUtility.FromJson<SaveData>(json);
-
-            BestScore = data.BestScore;
-        }
-    }
+    
 }

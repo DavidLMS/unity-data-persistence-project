@@ -14,9 +14,16 @@ using UnityEditor;
 public class MenuUIHandler : MonoBehaviour
 {
     public static string playerName;
+    public TextMeshProUGUI BestScoreText;
 
     private void Start()
     {
+        SceneController.Instance.LoadScore();
+        if(SceneController.BestScore > 0)
+        {
+            BestScoreText.text = "Best Score: " + SceneController.BestPlayer + " - " + SceneController.BestScore;
+        }
+
 
     }
 
@@ -28,7 +35,7 @@ public class MenuUIHandler : MonoBehaviour
 
     public void Exit()
     {
-        MainManager.Instance.SaveScore();
+        SceneController.Instance.SaveScore();
 #if UNITY_EDITOR
         EditorApplication.ExitPlaymode();
 #else
